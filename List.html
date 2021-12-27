@@ -1,0 +1,204 @@
+
+<h1>Manage Words</h1>
+<br />
+
+
+
+
+<br />
+
+<script src="./MapContent/TableScript.js"></script>
+
+<link rel="stylesheet" href="./MapContent/style.css" type="text/css">
+<!-- @*<style>
+        table tr.DBRows {
+            display: none;
+        }
+
+            table tr.DBRows.active {
+                display: table-row;
+            }
+    </style>*@ -->
+
+
+
+<h2>List Words</h2>
+
+<form action="/" method="get" onload="init_Tables()">
+
+    <br />
+    <div class="col-md-3">
+        Source Language :
+        <select id="SourceLang" style="color:black " class="form-control">
+            <option value="Q1860" selected>English</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        Target Language :
+        <select id="TargetLang" style="color:black " class="form-control col-md-3">
+            <option value="Q1860" selected>English</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        word :
+        <input type="text" name="word" id="word" value="" required class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label></label>
+        <input type="button" name="submit" value="Translate" onclick="Clicked()" class="form-control btn-success" />
+    </div>
+</form>
+<br />
+<br />
+<br />
+
+<hr />
+<h3>WIKIDATA Table</h3>
+<table class="table table-bordered" id="WD_list">
+    <thead>
+    <tr>
+
+        <th>source</th>
+        <th>sourceLemma</th>
+        <th>form</th>
+        <th>sense</th>
+        <th>target</th>
+        <th>targetLemma</th>
+        <th>word</th>
+        <th>command</th>
+
+
+    </tr>
+</thead>
+</table>
+<hr />
+<button class="btn btn-success" id="btn_Add">Add Word</button>
+<button class="btn btn-success" id="btn_json" onclick="exportJson()">Export Json</button>
+<br />
+<h3>YOUR Table</h3>
+<table class="table table-bordered" id="DB_list">
+</thead>
+    <tr>
+
+        <th>source</th>
+        <th>sourceLemma</th>
+        <th>form</th>
+        <th>sense</th>
+        <th>target</th>
+        <th>targetLemma</th>
+        <th>word</th>
+        <th>command</th>
+
+
+    </tr>
+</thead>
+
+
+</table>
+<!-- @*<a href="#" class="load_more">Load more</a>*@ -->
+<script type="text/javascript">
+
+    $(document).ready(init_Tables());
+
+    var apistring = "/api/wordsapi/getwords/";
+
+    $.getJSON(apistring,{ email:"@(User.Identity.GetUserName())" }, function (res) {
+        $.each(res, function (key, val) {
+           var item =  creat_Row_DB(key, val);
+            $("#DB_list").append(item);
+        });
+    })
+
+
+    $("#btn_Add").click(function () {
+        $.get("/home/addword", function (res) {
+            $("#myModal").modal();
+            $("#myModalLabel").html("Add Word");
+            $("#myModalBody").html(res);
+        });
+
+        ///////code for remove
+       // $("#DB_list").find("tr.DBRows").remove();
+    });
+
+
+
+
+    function Edit(id) {
+        $.get("/home/Editword/"+id, function (res) {
+            $("#myModal").modal();
+            $("#myModalLabel").html("Edit Word");
+            $("#myModalBody").html(res);
+        });
+    }
+    function deleteRow(id) {
+        if (confirm("Are you sure ?")) {
+            $.ajax({ url: "/api/wordsapi2/" + id, type: "Delete" }).done(function () {
+                $("#DB_list").find("tr#RDB" + id).remove();
+                console.log("deleted");
+            });
+        }
+    }
+
+
+
+    ////////////creat Row for DB Records
+    function creat_Row_DB(key, val) {
+        return "<tr class=\"DBRows\" id = \"RDB" + val.Id + "\"> <td>" + val.source + "</td><td>" + val.sourceLemma + "</td><td>" + val.form + "</td><td>" + val.sense + "</td><td>" + val.target + "</td><td>" + val.targetLemma + "</td><td>" + val.word + "</td><td>" + "<a style=\"margin: 3px\" class=\" btn btn-sm btn \" id=\"btn_Edit_DB\" onclick=\"Edit(" + val.Id + ")\"> <i class = \"glyphicon glyphicon-pencil\"></i></a>" + "<a style=\"margin: 3px\" class=\" btn btn-sm btn \" id=\"btn_delete_DB\" onclick=\"deleteRow(" + val.Id + ")\"><i class = \"glyphicon glyphicon-trash\"></i></a>"+ "</td></tr>";
+    }
+
+    function exportJson() {
+        var myRows = [];
+        var $headers = $("#DB_list th");
+        var $rows = $(".DBRows").each(function (index) {
+            $cells = $(this).find("td");
+            myRows[index] = {};
+            $cells.each(function (cellIndex) {
+                myRows[index][$($headers[cellIndex]).html()] = $(this).html();
+            });
+            delete myRows[index].command;
+        });
+
+        // Let's put this in the object like you want and convert to JSON (Note: jQuery will also do this for you on the Ajax request)
+        var myObj = {};
+        myObj.myrows = myRows;
+       // myRows[0].remove(source);
+       // console.log(myRows[0]);
+        console.log(JSON.stringify(myObj));
+        download("yourData.json", JSON.stringify(myObj));
+       // alert(JSON.stringify(myObj));
+    }
+
+
+    function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+
+    ////////////////Load more
+
+
+    //$('#DB_list.DBRows tr:first').addClass('active');
+    //console.log($('#DB_list.DBRows'));
+    //$('a.load_more').on('click', function (e) {
+    //    e.preventDefault();
+    //    var $rows = $('.DBRows');
+    //    var lastActiveIndex = $rows.filter('.active:last').index();
+    //    $rows.filter(':lt(' + (lastActiveIndex + 3) + ')').addClass('active');
+
+    //    // hide the button when all elements visible
+    //    $(this).toggle($rows.filter(':hidden').length !== 0);
+    //});
+
+
+
+
+</script>

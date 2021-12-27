@@ -4,9 +4,314 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+        <script src="./Content/jquery.js"></script>
+        <script src="./MapContent/TableScript.js"></script>
+    <link rel="stylesheet" href="./MapContent/theme/default/style.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./MapContent/style.css" type="text/css">
+    
+    <script src="./MapContent/OpenLayers.js"></script>
     <title>Document</title>
+    <style>
+        .content {
+          max-width: 1200px;
+          margin: auto;
+        }
+        </style>
 </head>
-<body>
+<body onload="init(); init_Tables();" class="content">
     <h1>second test</h1>
+    
+<br />
+<br />
+<br />
+<br />
+
+<br />
+
+<div >
+
+    <h1 id="title">Map</h1>
+
+
+
+    <div class="row" style="display: table; clear: both; box-sizing: border-box;">
+        
+
+
+        <div class="column" style="float: left; width: 50%; padding: 10px; height: 500px; width: 500px; box-sizing: border-box; background-color: #aba; ">
+            <div id="map" style="max-width: 100%; max-height: 100%; height: 500px; width: 500px; "></div>
+        </div>
+        <hr />
+        
+        </div>
+    </div>
+
+
+
+    <script src="./MapContent/script.js"></script>
+
+    <form action="/" method="get" onload="init_Tables()">
+
+        <br />
+        <div class="col-md-3">
+            Source Language :
+            <select id="SourceLang" style="color:black " class="form-control">
+                <option value="Q1860" selected>English</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            Target Language :
+            <select id="TargetLang" style="color:black " class="form-control col-md-3">
+                <option value="Q1860" selected>English</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            word :
+            <input type="text" name="word" id="word" value="" required class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label></label>
+            <input type="button" name="submit" value="Translate" onclick="Clicked()" class="form-control btn-success" />
+        </div>
+    </form>
+
+    <h3>WIKIDATA Table</h3>
+<table class="table table-bordered" id="WD_list">
+    <thead>
+    <tr>
+
+        
+        <th>source</th>
+        <th>sourceLemma</th>
+        <th>form</th>
+        <th>sense</th>
+        <th>target</th>
+        <th>targetLemma</th>
+        <th>word</th>
+        <th>command</th>
+
+
+    </tr>
+</thead>
+<tbody>
+
+</tbody>
+</table>
+
+    <div id="view">
+        <h2>YOUR Table</h2>
+        <button class="btn btn-success" id="btn_Add">Add Word</button>
+        <button class="btn btn-success" id="btn_json" onclick="exportJson()">Export Json</button>
+        <br>
+        <br>
+        <table class="table table-bordered" id="DB_list">
+            </thead>
+                <tr>
+                    <th>source</th>
+                    <th>sourceLemma</th>
+                    <th>form</th>
+                    <th>sense</th>
+                    <th>target</th>
+                    <th>targetLemma</th>
+                    <th>word</th>
+                    <th>command</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body" id="myModalBody">
+           
+                <dl class="dl-horizontal dl">
+                    <dt>source : </dt>
+                    <dd>
+                        <input type="text" id="txtsource" name="txtsource" value="" required class="valid form-control" />
+                    </dd>
+                
+                    <dt>sourceLemma : </dt>
+                    <dd>
+                        <input type="text" id="txtsourceLemma" name="txtsourceLemma" value="" required class="valid form-control" />
+                    </dd>
+                
+                
+                    <dt>form : </dt>
+                    <dd>
+                        <input type="text" id="txtform" name="txtform" value="" required class="valid form-control" />
+                    </dd>
+                
+                    <dt>sense : </dt>
+                    <dd>
+                        <input type="text" id="txtsense" name="txtsense" value="" required class="valid form-control" />
+                    </dd>
+                
+                    <dt>target : </dt>
+                    <dd>
+                        <input type="text" id="txttarget" name="txttarget" value="" required class="valid form-control" />
+                    </dd>
+                
+                    <dt>targetLemma : </dt>
+                    <dd>
+                        <input type="text" id="txttargetLemma" name="txttargetLemma" value="" required class="valid form-control" />
+                    </dd>
+                
+                    <dt>word : </dt>
+                    <dd>
+                        <input type="text" id="txtword" name="txtword" value="" required class="valid form-control" />
+                    </dd>
+                
+                    <br />
+                    <dt id="warning" style="color : red"></dt>
+                    <dd>
+                
+                        <input type="button" id="submit" name="submit" onclick="onSubmit()" value="submit" class="btn btn-success" />
+                    </dd>
+                
+                </dl>
+                
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Modal -->
+        
+<script>
+    selectedRow = null;
+     $("#btn_Add").click(function () {
+            $("#myModal").modal();
+            $("#myModalLabel").html("Add Word");
+       document.getElementById("submit").value = "submit";
+    });
+
+    function onSubmit(){
+        var formData = readFormData();
+        if(selectedRow == null){
+            insertNewRcord(formData);
+        }else{
+            updateRecord(formData);
+        }
+        resetForm();
+    }
+    function readFormData(){
+        var formData = {};
+        formData["source"] = document.getElementById("txtsource").value;
+        formData["sourceLemma"] = document.getElementById("txtsourceLemma").value;
+        formData["form"] = document.getElementById("txtform").value;
+        formData["target"] = document.getElementById("txttarget").value;
+        formData["sense"] = document.getElementById("txtsense").value;
+        formData["targetLemma"] = document.getElementById("txttargetLemma").value;
+        formData["word"] = document.getElementById("txtword").value;
+        return formData;
+    }
+    function insertNewRcord(data){
+        var table = document.getElementById("DB_list").getElementsByTagName('tbody')[0];
+        var newRow = table.insertRow(table.lenght);
+        newRow.setAttribute( "class" , "DBRows" );
+        cell0 = newRow.insertCell(0);
+        cell0.innerHTML = data.source;
+        cell1 = newRow.insertCell(1);
+        cell1.innerHTML = data.sourceLemma;
+        cell2 = newRow.insertCell(2);
+        cell2.innerHTML = data.form;
+        cell3 = newRow.insertCell(3);
+        cell3.innerHTML = data.sense;
+        cell4 = newRow.insertCell(4);
+        cell4.innerHTML = data.target;
+        cell5 = newRow.insertCell(5);
+        cell5.innerHTML = data.targetLemma;
+        cell6 = newRow.insertCell(6);
+        cell6.innerHTML = data.word;
+        cell7 = newRow.insertCell(7);
+        cell7.innerHTML = '<a style="margin: 3px" class=" btn btn-sm btn " id="btn_Edit_DB" onclick="onEdit(this)"> <i class = "glyphicon glyphicon-pencil"></i></a><a style="margin: 3px" class=" btn btn-sm btn " id="btn_delete_DB" onclick="onDelete(this)"><i class = "glyphicon glyphicon-trash"></i></a>';
+    }
+    function updateRecord(data){
+        selectedRow.cells[0].innerHTML = data.source;
+        selectedRow.cells[1].innerHTML = data.sourceLemma;
+        selectedRow.cells[2].innerHTML = data.form;
+        selectedRow.cells[3].innerHTML = data.sense;
+        selectedRow.cells[4].innerHTML = data.target;
+        selectedRow.cells[5].innerHTML = data.targetLemma;
+        selectedRow.cells[6].innerHTML = data.word;
+    }
+    function resetForm(){
+        document.getElementById("txtsource").value = "";
+        document.getElementById("txtsourceLemma").value = "";
+        document.getElementById("txtform").value = "";
+        document.getElementById("txtsense").value = "";
+        document.getElementById("txttarget").value = "";
+        document.getElementById("txttargetLemma").value = "";
+        document.getElementById("txtword").value = "";
+        $("#myModal").modal("hide");
+        selectedRow = null;
+    }
+    function onEdit(td){
+        selectedRow= td.parentElement.parentElement;
+        document.getElementById("txtsource").value = selectedRow.cells[0].innerHTML;
+        document.getElementById("txtsourceLemma").value=selectedRow.cells[1].innerHTML;
+        document.getElementById("txtform").value = selectedRow.cells[2].innerHTML;
+        document.getElementById("txtsense").value = selectedRow.cells[3].innerHTML;
+        document.getElementById("txttarget").value = selectedRow.cells[4].innerHTML;
+        document.getElementById("txttargetLemma").value=selectedRow.cells[5].innerHTML;
+        document.getElementById("txtword").value = selectedRow.cells[6].innerHTML;
+        document.getElementById("submit").value = "Edit";
+        $("#myModal").modal();
+        $("#myModal").modal();
+        $("#myModalLabel").html("Edit Word");
+    }
+    function onDelete(td){
+        if(confirm("Are you sure to delete this Record ? ")){
+            row =td.parentElement.parentElement;
+            document.getElementById("DB_list").deleteRow(row.rowIndex);
+            resetForm();
+        }
+    }
+    
+    function exportJson() {
+        var myRows = [];
+        var $headers = $("#DB_list th");
+        var $rows = $(".DBRows").each(function (index) {
+            $cells = $(this).find("td");
+            myRows[index] = {};
+            $cells.each(function (cellIndex) {
+                myRows[index][$($headers[cellIndex]).html()] = $(this).html();
+            });
+            delete myRows[index].command;
+            console.log("1time")
+        });
+        var myObj = {};
+        myObj.myrows = myRows;
+        download("yourData.json", JSON.stringify(myObj));
+    }
+
+    function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+</script>
 </body>
 </html>
+
+
+
+

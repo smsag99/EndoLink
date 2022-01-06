@@ -70,6 +70,8 @@ function Clicked() {
 
     makeSPARQLQuery(endpointUrl, sparqlQuery, function (data) {
         console.log(data);
+        console.log("test : ");
+        console.log(data.results.bindings[0]["sense"]);
         WDJson = data;
         //alert(data.results.bindings[0].targetLemma.value);
         CreatTableWD(data);
@@ -81,13 +83,28 @@ function Clicked() {
 
 
     function CreatTableWD(data) {
-        $("#WD_list").find(".WDRows").remove();
+
         $.each(data.results.bindings, function (key, val) {
-            var item = "<tr class=\"WDRows\" id = \"RDB" + key + "\"> <td>" + ToLink(val.source.value) + "</td> <td>" + val.sourceLemma.value + "</td> <td>" + ToLink(val.form.value) + "</td><td>" + ToLink(val.sense.value) + "</td> <td>" + ToLink(val.target.value) + "</td><td>" + val.targetLemma.value + "</td><td>" + val.word.value + "</td><td><a style =\"margin: 3px\" class=\" btn btn-sm btn \" id=\"btn_Edit_DB\" onclick=\"\"> <i class = \"glyphicon glyphicon-pencil\"></i></a>"+"  </td></tr>";
-            $("#WD_list").append(item);
-            //console.log(val);
-           
+            var rowData ={};
+            rowData["source"] =ToLink(val.source.value);
+            rowData["sourceLemma"] = val.sourceLemma.value;
+            rowData["form"] = ToLink(val.form.value);
+            rowData["sense"] = ToLink(val.sense.value);
+            rowData["target"] =ToLink(val.target.value);
+            rowData["targetLemma"] =val.targetLemma.value;
+            rowData["word"] = val.word.value;
+            insertNewRcord(rowData,"WD_list","WDRows",false);
         });
+
+
+
+
+        // $("#WD_list").find(".WDRows").remove();
+        // $.each(data.results.bindings, function (key, val) {
+        //     var item = "<tr class=\"WDRows\" id = \"RDB" + key + "\"> <td>" + ToLink(val.source.value) + "</td> <td>" + val.sourceLemma.value + "</td> <td>" + ToLink(val.form.value) + "</td><td>" + ToLink(val.sense.value) + "</td> <td>" + ToLink(val.target.value) + "</td><td>" + val.targetLemma.value + "</td><td>" + val.word.value + "</td><td><a style =\"margin: 3px\" class=\" btn btn-sm btn \" id=\"btn_Edit_DB\" onclick=\"\"> <i class = \"glyphicon glyphicon-pencil\"></i></a>"+"  </td></tr>";
+        //     $("#WD_list").append(item);
+        //     console.log();
+        // });
 
     }
 

@@ -59,6 +59,9 @@ var sourceLang, targetLang;
     trigger: function (e) {
         RemoveLayer();
     lonlat = map.getLonLatFromPixel(e.xy);
+    console.log(lonlat);
+
+
     console.log(map);
     AddLayer();
 
@@ -115,7 +118,7 @@ var sourceLang, targetLang;
             country = result.features[0].properties.address.country;
             county = result.features[0].properties.address.county;
             state = result.features[0].properties.address.state;
-
+console.log(result);
             alert("country : " + country + "\nstate : " + state + "\ncounty : " + county +"\ncity : " + city +"\n lat : "+point.lat+"  lon : "+point.lon  );
            // alert(result)
         })

@@ -50,24 +50,24 @@
     <form action="/" method="get" onload="init_Tables()">
         <br />
         <div class="col-md-3">
-            Source Language :
-            <select id="SourceLang" style="color:black " class="form-control">
-                <option value="Q1860" selected>English</option>
+            Select Language :
+            <select id="LanguageSelect" style="color:black " class="form-control">
+                <option value="" selected>Please Select</option>
             </select>
         </div>
         <div class="col-md-3">
-            Target Language :
-            <select id="TargetLang" style="color:black " class="form-control col-md-3">
-                <option value="Q1860" selected>English</option>
+            Select Country :
+            <select id="CountrySelect" style="color:black " class="form-control col-md-3">
+                <option value="" selected>Any</option>
             </select>
         </div>
         <div class="col-md-3">
             word :
-            <input type="text" name="word" id="word" value="" required class="form-control" />
+            <input type="text" name="word" id="village" value="" required class="form-control" />
         </div>
         <div class="col-md-3">
             <label></label>
-            <input type="button" name="submit" value="Translate" onclick="Clicked()" class="form-control btn-success" />
+            <input type="button" name="submit" value="Go" onclick="clickonGo()" class="form-control btn-success" />
         </div>
     </form>
 
@@ -75,14 +75,14 @@
 <table class="table table-bordered" id="WD_list">
     </thead>
     <tr>
-        <th>source</th>
-        <th>sourceLemma</th>
-        <th>form</th>
-        <th>sense</th>
-        <th>target</th>
-        <th>targetLemma</th>
-        <th>word</th>
-        <th>command</th>
+            <th>OSM ID</th>     
+            <th>Display Name</th>
+            <th>Language</th>
+            <th>Cordinate</th>
+            <th>WIKI Data</th>
+            <th>Country</th> 
+             <th>OSM Type</th> 
+            <th>command</th>
     </tr>
     </thead>
     <tbody>
@@ -99,13 +99,13 @@
         <table class="table table-bordered" id="DB_list">
             </thead>
                 <tr>
-                    <th>source</th>
-                    <th>sourceLemma</th>
-                    <th>form</th>
-                    <th>sense</th>
-                    <th>target</th>
-                    <th>targetLemma</th>
-                    <th>word</th>
+                    <th>OSM ID</th>     
+                    <th>Display Name</th>
+                    <th>Language</th>
+                    <th>Cordinate</th>
+                    <th>WIKI Data</th>
+                    <th>Country</th> 
+                     <th>OSM Type</th> 
                     <th>command</th>
                 </tr>
             </thead>
@@ -126,41 +126,43 @@
             <div class="modal-body" id="myModalBody">
            
                 <dl class="dl-horizontal dl">
-                    <dt>source : </dt>
+                    <dt>OSM ID : </dt>
                     <dd>
-                        <input type="text" id="txtsource" name="txtsource" value="" required class="valid form-control" />
+                        <input type="text" id="txtOSMID" name="txtOSMID" value="" required class="valid form-control" disabled/>
                     </dd>
                 
-                    <dt>sourceLemma : </dt>
+                    <dt>Display Name : </dt>
                     <dd>
-                        <input type="text" id="txtsourceLemma" name="txtsourceLemma" value="" required class="valid form-control" />
+                        <input type="text" id="txtDisplayName" name="txtDisplayName" value="" required class="valid form-control" />
                     </dd>
                 
                 
-                    <dt>form : </dt>
+                    <dt>Language : </dt>
                     <dd>
-                        <input type="text" id="txtform" name="txtform" value="" required class="valid form-control" />
+                        <select id="LanguageSelectClient" style="color:black " class="form-control">
+                            <option value="" selected>Please Select</option>
+                        </select>  
                     </dd>
                 
-                    <dt>sense : </dt>
+                    <dt>Cordinate : </dt>
                     <dd>
-                        <input type="text" id="txtsense" name="txtsense" value="" required class="valid form-control" />
+                        <input type="text" id="txtCordinate" name="txtCordinate" value="" required class="valid form-control" disabled />
                     </dd>
                 
-                    <dt>target : </dt>
+                    <dt>WIKI Data : </dt>
                     <dd>
-                        <input type="text" id="txttarget" name="txttarget" value="" required class="valid form-control" />
+                        <input type="text" id="txtWIKIDATA" name="txtWIKIDATA" value="" required class="valid form-control" disabled/>
                     </dd>
                 
-                    <dt>targetLemma : </dt>
+                    <dt>Country : </dt>
                     <dd>
-                        <input type="text" id="txttargetLemma" name="txttargetLemma" value="" required class="valid form-control" />
+                        <input type="text" id="txtCountry" name="txtCountry" value="" required class="valid form-control" disabled/>
                     </dd>
                 
-                    <dt>word : </dt>
+                     <dt>OSM Type : </dt>
                     <dd>
-                        <input type="text" id="txtword" name="txtword" value="" required class="valid form-control" />
-                    </dd>
+                        <input type="text" id="txtOSM_Type" name="txtOSM_Type" value="" required class="valid form-control" disabled/>
+                    </dd> 
                 
                     <br />
                     <dt id="warning" style="color : red"></dt>
@@ -181,7 +183,50 @@
 <!-- End Modal -->
         
 <script>
-    selectedRow = null;
+    
+var selectedRow = null;
+var moveDown = false;
+function readDataFromJson(data){
+    var formData = {};
+    langselect = document.getElementById("LanguageSelect");
+    formData["OSMID"] = data['osm_id'];
+    formData["DisplayName"] = data['display_name'];
+    formData["Language"] = langselect.options[langselect.selectedIndex].text;
+    formData["Cordinate"] = data['lat'] + " , " + data['lon'];
+    formData["WIKIDATA"] = data['extratags']['wikidata'];
+    formData["Country"] = data['address']['country'];
+    formData["OSM_Type"] = data['osm_type'];
+
+   insertNewRcord(formData,"WD_list","WDRows",false);
+}
+
+function resetWDTable(){
+    (document.getElementById("WD_list").getElementsByTagName('tbody')[1]).innerHTML='';
+}
+
+function showOnMap(cordinate){
+    console.log("done");
+    point = {};
+    lonlat = (cordinate+"").split(',');
+    //console.log(lonlat);
+    point['lat']=parseFloat(lonlat[0]);
+    point['lon']=parseFloat(lonlat[1]);
+    point = transToOld(point);
+    
+    RemoveLayer();
+    AddLayer();
+    if (marker != null) {
+        RemoveMarker();
+            }
+    AddMarker(point);
+    map.panTo(point);
+    if (map.getZoom() < 4)
+    map.zoomTo(8);
+
+}
+
+
+
      $("#btn_Add").click(function () {
             $("#myModal").modal();
             $("#myModalLabel").html("Add Word");
@@ -189,79 +234,92 @@
     });
 
     function onSubmit(){
+        console.log("submit");
         var formData = readFormData();
-        if(selectedRow == null){
+        
+         if(selectedRow == null || moveDown){
             insertNewRcord(formData,"DB_list","DBRows",true);
+            moveDown = false;
         }else{
             updateRecord(formData);
         }
+        
         resetForm();
     }
     function readFormData(){
         var formData = {};
-        formData["source"] = document.getElementById("txtsource").value;
-        formData["sourceLemma"] = document.getElementById("txtsourceLemma").value;
-        formData["form"] = document.getElementById("txtform").value;
-        formData["sense"] = document.getElementById("txtsense").value;
-        formData["target"] = document.getElementById("txttarget").value;
-        formData["targetLemma"] = document.getElementById("txttargetLemma").value;
-        formData["word"] = document.getElementById("txtword").value;
+        formData["OSMID"] = document.getElementById("txtOSMID").value;
+        formData["DisplayName"] = document.getElementById("txtDisplayName").value;
+        formData["Language"] = document.getElementById("LanguageSelectClient").value;
+        formData["Cordinate"] = document.getElementById("txtCordinate").value;
+        formData["WIKIDATA"] = document.getElementById("txtWIKIDATA").value;
+        formData["Country"] = document.getElementById("txtCountry").value;
+        formData["OSM_Type"] = document.getElementById("txtOSM_Type").value;
         return formData;
     }
     
     function insertNewRcord(data,TableName,RowName,hasTrash){
-        var table = document.getElementById(TableName).getElementsByTagName('tbody')[0];
+        var table = document.getElementById(TableName).getElementsByTagName("tbody")[1];
         var newRow = table.insertRow(table.lenght);
         newRow.setAttribute( "class" , RowName );
         cell0 = newRow.insertCell(0);
-        cell0.innerHTML = data.source;
+        cell0.innerHTML = ((data.OSMID)+"").link("https://www.openstreetmap.org/"+ data.OSM_Type+"/"+data.OSMID);
         cell1 = newRow.insertCell(1);
-        cell1.innerHTML = data.sourceLemma;
+        cell1.innerHTML = data.DisplayName;
         cell2 = newRow.insertCell(2);
-        cell2.innerHTML = data.form;
+        cell2.innerHTML = data.Language;
         cell3 = newRow.insertCell(3);
-        cell3.innerHTML = data.sense;
+        cell3.innerHTML = ((data.Cordinate)+"").link("#");
+        cell3.addEventListener("click", function(){showOnMap(this.getElementsByTagName('a')[0].innerHTML)});
         cell4 = newRow.insertCell(4);
-        cell4.innerHTML = data.target;
+        cell4.innerHTML =((data.WIKIDATA)+"").link("https://www.wikidata.org/wiki/"+ data.WIKIDATA);
         cell5 = newRow.insertCell(5);
-        cell5.innerHTML = data.targetLemma;
+        cell5.innerHTML = data.Country;
         cell6 = newRow.insertCell(6);
-        cell6.innerHTML = data.word;
+        cell6.innerHTML = data.OSM_Type;
         cell7 = newRow.insertCell(7);
-        cell7.innerHTML = '<a style="margin: 3px" class=" btn btn-sm" id="btn_Edit_DB" onclick="onEdit(this)"> <i class = "glyphicon glyphicon-pencil"></i></a> ';
         if(hasTrash){
+            cell7.innerHTML = '<a style="margin: 3px" class=" btn btn-sm" id="btn_Edit_DB" onclick="onEdit(this)"> <i class = "glyphicon glyphicon-pencil"></i></a> ';
             cell7.innerHTML += '<a style="margin: 3px" class=" btn btn-sm" id="btn_delete_DB" onclick="onDelete(this)"><i class = "glyphicon glyphicon-trash"></i></a>';
+        }else{
+            cell7.innerHTML = '<a style="margin: 3px" class=" btn btn-sm" id="btn_Edit_DB" onclick="MoveToDown(this)"> <i class = "glyphicon glyphicon-pencil"></i></a> ';
         }
     }
+    function MoveToDown(td){
+        moveDown = true;
+        onEdit(td);
+    }
     function updateRecord(data){
-        selectedRow.cells[0].innerHTML = data.source;
-        selectedRow.cells[1].innerHTML = data.sourceLemma;
-        selectedRow.cells[2].innerHTML = data.form;
-        selectedRow.cells[3].innerHTML = data.sense;
-        selectedRow.cells[4].innerHTML = data.target;
-        selectedRow.cells[5].innerHTML = data.targetLemma;
-        selectedRow.cells[6].innerHTML = data.word;
+        console.log("update");
+        selectedRow.cells[0].innerHTML = ((data.OSMID)+"").link("https://www.openstreetmap.org/"+ data.OSM_Type+"/"+data.OSMID);
+        selectedRow.cells[1].innerHTML = data.DisplayName;
+        selectedRow.cells[2].innerHTML = data.Language;
+        selectedRow.cells[3].innerHTML = ((data.Cordinate)+"").link("#");
+        selectedRow.cells[4].innerHTML = ((data.WIKIDATA)+"").link("https://www.wikidata.org/wiki/"+ data.WIKIDATA);
+        selectedRow.cells[5].innerHTML = data.Country;
+        selectedRow.cells[6].innerHTML = data.OSM_Type;
     }
     function resetForm(){
-        document.getElementById("txtsource").value = "";
-        document.getElementById("txtsourceLemma").value = "";
-        document.getElementById("txtform").value = "";
-        document.getElementById("txtsense").value = "";
-        document.getElementById("txttarget").value = "";
-        document.getElementById("txttargetLemma").value = "";
-        document.getElementById("txtword").value = "";
+        document.getElementById("txtOSMID").value = "";
+        document.getElementById("txtDisplayName").value = "";
+        document.getElementById("LanguageSelectClient").value="";
+        document.getElementById("txtCordinate").value = "";
+        document.getElementById("txtWIKIDATA").value = "";
+        document.getElementById("txtCountry").value = "";
+        document.getElementById("txtOSM_Type").value = "";
         $("#myModal").modal("hide");
         selectedRow = null;
     }
     function onEdit(td){
-        selectedRow= td.parentElement.parentElement;
-        document.getElementById("txtsource").value = selectedRow.cells[0].innerHTML;
-        document.getElementById("txtsourceLemma").value=selectedRow.cells[1].innerHTML;
-        document.getElementById("txtform").value = selectedRow.cells[2].innerHTML;
-        document.getElementById("txtsense").value = selectedRow.cells[3].innerHTML;
-        document.getElementById("txttarget").value = selectedRow.cells[4].innerHTML;
-        document.getElementById("txttargetLemma").value=selectedRow.cells[5].innerHTML;
-        document.getElementById("txtword").value = selectedRow.cells[6].innerHTML;
+        console.log("edit");
+        selectedRow = td.parentElement.parentElement;
+        document.getElementById("txtOSMID").value = selectedRow.cells[0].getElementsByTagName('a')[0].innerHTML;
+        document.getElementById("txtDisplayName").value=selectedRow.cells[1].innerHTML;
+        document.getElementById("LanguageSelectClient").value = selectedRow.cells[2].innerHTML;
+        document.getElementById("txtCordinate").value = selectedRow.cells[3].getElementsByTagName('a')[0].innerHTML;
+        document.getElementById("txtWIKIDATA").value = selectedRow.cells[4].getElementsByTagName('a')[0].innerHTML;
+        document.getElementById("txtCountry").value=selectedRow.cells[5].innerHTML;
+        document.getElementById("txtOSM_Type").value = selectedRow.cells[6].innerHTML;
         document.getElementById("submit").value = "Edit";
         $("#myModal").modal();
         $("#myModal").modal();

@@ -340,7 +340,15 @@ function showOnMap(cordinate){
             $cells = $(this).find("td");
             myRows[index] = {};
             $cells.each(function (cellIndex) {
-                myRows[index][$($headers[cellIndex]).html()] = $(this).html();
+                
+                switch(cellIndex){
+                    case 0 : case 3: case 4 : 
+                    myRows[index][$($headers[cellIndex]).html()] = $(this).children('a')[0].innerHTML;
+                    break;
+                    case 1: case 2 : case 5: case 6: 
+                    myRows[index][$($headers[cellIndex]).html()] = $(this).html();
+                    break;
+                }
             });
             delete myRows[index].command;
             console.log("1time")

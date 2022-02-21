@@ -22,14 +22,8 @@
         </style>
 </head>
 <body onload="init(); init_Tables();" class="content">
-    <h1>second test</h1>
-    
-<br />
-<br />
-<br />
-<br />
+  
 
-<br />
 
 <div >
 
@@ -62,16 +56,16 @@
             </select>
         </div>
         <div class="col-md-3">
-            word :
+            city, village, etc... :
             <input type="text" name="word" id="village" value="" required class="form-control" />
         </div>
         <div class="col-md-3">
             <label></label>
-            <input type="button" name="submit" value="Go" onclick="clickonGo()" class="form-control btn-success" />
+            <input type="button" name="submit" value="Search" onclick="clickonGo()" class="form-control btn-success" />
         </div>
     </form>
 
-    <h2>WIKIDATA Table</h2>
+    <h2>OSM Table</h2>
 <table class="table table-bordered" id="WD_list">
     </thead>
     <tr>
@@ -93,9 +87,8 @@
     <div id="view">
         <h2>YOUR Table</h2>
         <!-- <button class="btn btn-success" id="btn_Add">Add Word</button> -->
-        <button class="btn btn-success" id="btn_json" onclick="exportJson()">Export Json</button>
-        <br>
-        <br>
+        
+   
         <table class="table table-bordered" id="DB_list">
             </thead>
                 <tr>
@@ -113,6 +106,9 @@
 
             </tbody>
         </table>
+     
+        <button class="btn btn-success" id="btn_json" onclick="exportJson()">Export Json</button>
+        <br>
     </div>
 </div>
 <!-- Modal -->
